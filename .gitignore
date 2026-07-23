@@ -1,0 +1,31 @@
+# Dependencies
+/node_modules
+/Backend/node_modules
+/Backend/vendor
+
+# Environment & Config
+.env
+Backend/.env
+Backend/.env.backup
+Backend/.env.production
+Backend/auth.json
+
+# Cache & Storage
+Backend/storage/*.key
+Backend/storage/framework/cache/*
+Backend/storage/framework/sessions/*
+Backend/storage/framework/views/*
+Backend/storage/logs/*
+Backend/storage/pail
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDEs
+.idea
+.vscode
+.fleet
+.nova
+.zed
