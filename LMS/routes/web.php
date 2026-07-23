@@ -92,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/grades',               [StudentController::class, 'grades'])->name('grades');
         Route::get('/assignments',          [StudentController::class, 'assignments'])->name('assignments');
         Route::post('/assignments/{id}/submit', [StudentController::class, 'submitAssignment'])->name('assignments.submit');
+        Route::delete('/submissions/{id}',  [StudentController::class, 'deleteSubmission'])->name('submissions.delete');
         Route::get('/calendar',             [StudentController::class, 'calendar'])->name('calendar');
         Route::get('/profile',              [StudentController::class, 'profile'])->name('profile');
         Route::post('/profile',             [StudentController::class, 'saveProfile'])->name('profile.save');

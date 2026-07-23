@@ -135,6 +135,18 @@ class StudentController extends Controller {
         return back()->with('success', 'Assignment submitted successfully!');
     }
 
+    public function deleteSubmission($id) {
+        $submission = Submission::where('student_id', Auth::id())->findOrFail($id);
+
+        if ($submission->file_path && file_exists(public_path($submission->file_path))) {
+            @unlink(public_path($submission->file_path));
+        }
+
+        $submission->delete();
+
+        return back()->with('success', 'Submission deleted successfully!');
+    }
+
     public function calendar() {
         return view('student.calendar');
     }

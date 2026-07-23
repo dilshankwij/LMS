@@ -92,14 +92,21 @@
                   </button>
                 @else
                   <div class="d-flex flex-column align-items-start">
-                    <a href="{{ asset($sub->file_path) }}" target="_blank" style="font-size:0.8rem; font-weight:500;">
-                      <i class="fas fa-file mr-1"></i>My Submission
+                    <a href="{{ asset($sub->file_path) }}" target="_blank" class="mb-1" style="font-size:0.8rem; font-weight:500;">
+                      <i class="fas fa-file mr-1 text-cx-primary"></i>My Submission
                     </a>
                     @if($sub->feedback)
-                    <small class="text-muted font-italic mt-1" style="max-width:200px;">
+                    <small class="text-muted font-italic mb-1" style="max-width:200px;">
                       <strong>Feedback:</strong> "{{ $sub->feedback }}"
                     </small>
                     @endif
+                    <form action="{{ route('student.submissions.delete', $sub->id) }}" method="POST" class="mt-1" onsubmit="return confirm('Are you sure you want to delete this submission?')">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-xs btn-outline-danger">
+                        <i class="fas fa-trash mr-1"></i>Delete Submission
+                      </button>
+                    </form>
                   </div>
                 @endif
               </td>
