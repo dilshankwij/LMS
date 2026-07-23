@@ -1,22 +1,22 @@
 # Dependencies
 /node_modules
-/Backend/node_modules
-/Backend/vendor
+/LMS/node_modules
+/LMS/vendor
 
 # Environment & Config
 .env
-Backend/.env
-Backend/.env.backup
-Backend/.env.production
-Backend/auth.json
+LMS/.env
+LMS/.env.backup
+LMS/.env.production
+LMS/auth.json
 
 # Cache & Storage
-Backend/storage/*.key
-Backend/storage/framework/cache/*
-Backend/storage/framework/sessions/*
-Backend/storage/framework/views/*
-Backend/storage/logs/*
-Backend/storage/pail
+LMS/storage/*.key
+LMS/storage/framework/cache/*
+LMS/storage/framework/sessions/*
+LMS/storage/framework/views/*
+LMS/storage/logs/*
+LMS/storage/pail
 
 # OS Files
 .DS_Store
