@@ -70,14 +70,27 @@
                   @forelse($sec->lessons as $l)
                   <div class="d-flex justify-content-between align-items-center py-3 px-4 border-bottom" style="font-size:0.88rem">
                     <div>
-                      <i class="far fa-play-circle mr-2 text-cx-primary"></i>
+                      @if(($l->type ?? 'video') === 'video')
+                        <i class="fab fa-youtube text-danger mr-2 font-weight-bold"></i>
+                      @elseif($l->type === 'document')
+                        <i class="fas fa-file-pdf text-warning mr-2"></i>
+                      @else
+                        <i class="fas fa-file-alt text-info mr-2"></i>
+                      @endif
                       <span class="font-weight-bold">{{ $l->title }}</span>
-                      @if($l->video_url)
-                        <span class="badge badge-info ml-2"><i class="fab fa-youtube mr-1"></i>Video</span>
+
+                      @if(($l->type ?? 'video') === 'video')
+                        <span class="badge badge-info ml-2"><i class="fab fa-youtube mr-1"></i>YouTube Video</span>
+                      @elseif($l->type === 'document')
+                        <span class="badge badge-warning ml-2"><i class="fas fa-paperclip mr-1"></i>Document</span>
+                        @if($l->attachment)
+                          <a href="{{ asset($l->attachment) }}" target="_blank" class="small text-muted ml-1">(View File)</a>
+                        @endif
+                      @else
+                        <span class="badge badge-primary ml-2"><i class="fas fa-book-open mr-1"></i>Reading Note</span>
                       @endif
                     </div>
                     <div class="d-flex align-items-center">
-                      <span class="text-muted mr-3">{{ $l->duration }}</span>
                       <form action="{{ route('teacher.lessons.delete', $l->id) }}" method="POST" onsubmit="return confirm('Delete this lesson?')">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn btn-xs btn-outline-danger"><i class="fas fa-trash"></i></button>
@@ -98,10 +111,10 @@
             <div class="modal fade" id="addLessonModal-{{ $sec->id }}" tabindex="-1">
               <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                  <form action="{{ route('teacher.lessons.store', $sec->id) }}" method="POST">
+                  <form action="{{ route('teacher.lessons.store', $sec->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header bg-gradient-primary text-white">
-                      <h5 class="modal-title"><i class="fas fa-plus-circle mr-2"></i>Add Lesson to "{{ $sec->name }}"</h5>
+                      <h5 class="modal-title"><i class="fas fa-plus-circle mr-2"></i>Add Lesson / Content to "{{ $sec->name }}"</h5>
                       <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -109,20 +122,34 @@
                         <label class="font-weight-bold">Lesson Title <span class="text-danger">*</span></label>
                         <input type="text" name="title" class="form-control" placeholder="e.g. Introduction to React Hooks" required>
                       </div>
+
                       <div class="form-group">
+                        <label class="font-weight-bold">Select Content / Resource Type <span class="text-danger">*</span></label>
+                        <select name="type" class="form-control lesson-type-select" data-sec="{{ $sec->id }}" required>
+                          <option value="video">YouTube Video</option>
+                          <option value="document">Document / File Attachment (PDF, Slides, DOCX, ZIP)</option>
+                          <option value="text">Text Notes / Reading Material</option>
+                        </select>
+                      </div>
+
+                      {{-- YouTube Video Input --}}
+                      <div id="type-video-{{ $sec->id }}" class="form-group type-block-{{ $sec->id }}">
                         <label class="font-weight-bold"><i class="fab fa-youtube text-danger mr-1"></i>YouTube Video URL</label>
                         <input type="url" name="video_url" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
-                        <small class="text-muted">Paste a full YouTube URL. Students will see this video embedded in the lesson player.</small>
+                        <small class="text-muted">Paste a full YouTube URL. Students will see this embedded in the lesson player.</small>
                       </div>
-                      <div class="row">
-                        <div class="col-md-4 form-group">
-                          <label class="font-weight-bold">Duration</label>
-                          <input type="text" name="duration" class="form-control" placeholder="e.g. 15:00" value="10:00">
-                        </div>
+
+                      {{-- Document Upload Input --}}
+                      <div id="type-document-{{ $sec->id }}" class="form-group type-block-{{ $sec->id }}" style="display:none;">
+                        <label class="font-weight-bold"><i class="fas fa-file-upload text-warning mr-1"></i>Upload Document / Resource File</label>
+                        <input type="file" name="attachment_file" class="form-control-file">
+                        <small class="text-muted d-block mt-1">Accepted formats: PDF, DOCX, PPTX, ZIP, TXT, PNG, JPG (Max 20MB).</small>
                       </div>
+
+                      {{-- Lesson Content / Text Notes --}}
                       <div class="form-group">
-                        <label class="font-weight-bold">Lesson Content / Description</label>
-                        <textarea name="content" class="form-control" rows="4" placeholder="Describe what this lesson covers..."></textarea>
+                        <label class="font-weight-bold">Lesson Text / Reading Notes / Description</label>
+                        <textarea name="content" class="form-control" rows="5" placeholder="Type lecture notes, instructions, or reading content for students..."></textarea>
                       </div>
                     </div>
                     <div class="modal-footer">
@@ -205,4 +232,21 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+  $(document).ready(function() {
+    $('.lesson-type-select').on('change', function() {
+      var secId = $(this).data('sec');
+      var selected = $(this).val();
+      $('.type-block-' + secId).hide();
+      if (selected === 'video') {
+        $('#type-video-' + secId).show();
+      } else if (selected === 'document') {
+        $('#type-document-' + secId).show();
+      }
+    });
+  });
+</script>
 @endsection

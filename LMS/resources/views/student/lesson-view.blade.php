@@ -50,11 +50,12 @@
       @foreach($course->sections as $sec)
       <div class="cx-section-header"><i class="fas fa-folder mr-2"></i>{{ $sec->name }}</div>
       @foreach($sec->lessons as $l)
+      @php $lType = $l->type ?? 'video'; @endphp
       <a href="{{ route('student.lesson-view', $l->id) }}" class="cx-lesson-item {{ $l->id === $lesson->id ? 'active' : '' }}">
-        <i class="cx-icon {{ $l->id === $lesson->id ? 'fas fa-play-circle' : 'far fa-circle' }}"></i>
+        <i class="cx-icon {{ $lType === 'video' ? 'fab fa-youtube text-danger' : ($lType === 'document' ? 'fas fa-file-pdf text-warning' : 'fas fa-file-alt text-info') }}"></i>
         <div class="flex-1">
           <div>{{ $l->title }}</div>
-          <small style="opacity:0.7;">{{ $l->duration }}</small>
+          <small style="opacity:0.7;">{{ ucfirst($lType) }}</small>
         </div>
       </a>
       @endforeach
@@ -64,7 +65,7 @@
     <!-- Center Player content -->
     <div class="cx-lesson-content">
       @php
-        // Extract YouTube embed ID if video_url is present
+        $type = $lesson->type ?? 'video';
         $youtubeId = null;
         if (!empty($lesson->video_url)) {
             if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $lesson->video_url, $matches)) {
@@ -73,30 +74,58 @@
         }
       @endphp
 
-      <div class="cx-video-wrapper">
-        @if($youtubeId)
-          <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        @elseif($lesson->video_url)
-          <iframe src="{{ $lesson->video_url }}" allowfullscreen></iframe>
-        @else
-          <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
-            <i class="fas fa-video-slash text-muted mb-3" style="font-size:4rem;"></i>
-            <h5 class="text-white font-weight-bold">No Video Uploaded</h5>
-            <p class="text-muted" style="font-size:0.85rem;">The instructor has not attached a YouTube video for this lesson yet.</p>
+      @if($type === 'video')
+        <div class="cx-video-wrapper">
+          @if($youtubeId)
+            <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          @elseif($lesson->video_url)
+            <iframe src="{{ $lesson->video_url }}" allowfullscreen></iframe>
+          @else
+            <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
+              <i class="fas fa-video-slash text-muted mb-3" style="font-size:4rem;"></i>
+              <h5 class="text-white font-weight-bold">No Video Provided</h5>
+              <p class="text-muted" style="font-size:0.85rem;">The instructor has not attached a YouTube video for this lesson yet.</p>
+            </div>
+          @endif
+        </div>
+      @elseif($type === 'document')
+        <div class="p-5 mb-4 text-center rounded" style="background:#1e293b; border:1px solid #334155;">
+          <i class="fas fa-file-pdf text-warning mb-3" style="font-size:4.5rem;"></i>
+          <h4 class="text-white font-weight-bold mb-2">Lesson Document / Resource</h4>
+          <p class="text-muted mb-4" style="font-size:0.9rem;">Download and review the attached learning material for this lecture.</p>
+          @if($lesson->attachment)
+            <a href="{{ asset($lesson->attachment) }}" target="_blank" class="btn btn-lg btn-cx-primary">
+              <i class="fas fa-download mr-2"></i> Download Attachment File
+            </a>
+          @else
+            <div class="alert alert-secondary d-inline-block">No file attachment uploaded for this lesson.</div>
+          @endif
+        </div>
+      @else
+        <div class="p-4 mb-4 rounded" style="background:#1e293b; border:1px solid #334155;">
+          <div class="d-flex align-items-center mb-3">
+            <i class="fas fa-book-open text-info mr-3" style="font-size:2rem;"></i>
+            <h4 class="text-white font-weight-bold mb-0">Reading Material & Lecture Notes</h4>
           </div>
-        @endif
-      </div>
+        </div>
+      @endif
 
       <div class="max-width-800 mx-auto text-white">
         <div class="d-flex justify-content-between align-items-start mb-3">
           <div>
             <h3 class="font-weight-bold mb-1" style="font-family:'Poppins',sans-serif">{{ $lesson->title }}</h3>
-            <span class="badge badge-primary"><i class="far fa-clock mr-1"></i> {{ $lesson->duration }}</span>
+            @if($type === 'video')
+              <span class="badge badge-info"><i class="fab fa-youtube mr-1"></i> Video Lecture</span>
+            @elseif($type === 'document')
+              <span class="badge badge-warning"><i class="fas fa-paperclip mr-1"></i> Resource File</span>
+            @else
+              <span class="badge badge-primary"><i class="fas fa-file-alt mr-1"></i> Reading Material</span>
+            @endif
           </div>
         </div>
 
-        <p class="text-slate-300" style="font-size:0.95rem; line-height:1.6; color:#cbd5e1;">
-          {{ $lesson->content ?: 'In this lesson, follow along with the instructor video above to build your practical knowledge step by step.' }}
+        <p class="text-slate-300" style="font-size:0.95rem; line-height:1.7; color:#cbd5e1; white-space: pre-line;">
+          {{ $lesson->content ?: 'Follow along with the lecture notes and materials provided above.' }}
         </p>
 
         <div class="d-flex justify-content-between mt-5 pt-3 border-top border-secondary" style="border-color:#334155 !important;">

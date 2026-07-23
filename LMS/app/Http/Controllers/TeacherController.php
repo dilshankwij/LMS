@@ -314,21 +314,33 @@ class TeacherController extends Controller {
     public function storeLesson(Request $request, $sectionId) {
         $section = Section::whereHas('course', fn($q) => $q->where('teacher_id', Auth::id()))->findOrFail($sectionId);
         $data = $request->validate([
-            'title'     => ['required', 'string', 'max:255'],
-            'video_url' => ['nullable', 'url'],
-            'content'   => ['nullable', 'string'],
-            'duration'  => ['nullable', 'string', 'max:10'],
+            'title'           => ['required', 'string', 'max:255'],
+            'type'            => ['required', 'string', 'in:video,document,text'],
+            'video_url'       => ['nullable', 'url'],
+            'attachment_file' => ['nullable', 'file', 'mimes:pdf,zip,doc,docx,ppt,pptx,png,jpg,jpeg,txt', 'max:20480'],
+            'content'         => ['nullable', 'string'],
         ]);
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment_file')) {
+            $file = $request->file('attachment_file');
+            $filename = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/lessons'), $filename);
+            $attachmentPath = 'uploads/lessons/' . $filename;
+        }
+
         $maxOrder = $section->lessons()->max('order') ?? 0;
         Lesson::create([
             'section_id' => $section->id,
             'title'      => $data['title'],
+            'type'       => $data['type'],
             'video_url'  => $data['video_url'] ?? null,
+            'attachment' => $attachmentPath,
             'content'    => $data['content'] ?? null,
-            'duration'   => $data['duration'] ?? '10:00',
             'order'      => $maxOrder + 1,
         ]);
-        return back()->with('success', 'Lesson added!');
+
+        return back()->with('success', 'Lesson added successfully!');
     }
 
     public function deleteLesson($id) {
