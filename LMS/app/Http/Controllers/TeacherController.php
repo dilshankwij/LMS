@@ -321,6 +321,15 @@ class TeacherController extends Controller {
             'content'         => ['nullable', 'string'],
         ]);
 
+        // Prevent duplicate lesson creation with exact same title in section
+        $existing = Lesson::where('section_id', $section->id)
+            ->where('title', $data['title'])
+            ->first();
+
+        if ($existing) {
+            return back()->with('warning', 'A lesson with the title "' . $data['title'] . '" already exists in this section.');
+        }
+
         $attachmentPath = null;
         if ($request->hasFile('attachment_file')) {
             $file = $request->file('attachment_file');

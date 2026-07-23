@@ -21,6 +21,12 @@
       <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
     </div>
     @endif
+    @if(session('warning'))
+    <div class="alert alert-warning alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('warning') }}
+    </div>
+    @endif
     @if($errors->any())
     <div class="alert alert-danger alert-dismissible">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
