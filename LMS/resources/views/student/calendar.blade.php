@@ -25,9 +25,9 @@
       themeSystem: 'bootstrap',
       initialView: 'dayGridMonth',
       events: [
-        { title: 'Portfolio Project Deadline', start: '2026-07-15', color: '#ef4444' },
-        { title: 'JavaScript To-Do Due', start: '2026-07-10', color: '#ef4444' },
-        { title: 'Midterm Assessment', start: '2026-07-22', color: '#7c3aed' }
+        { title: 'Portfolio Project Deadline', start: '{{ now()->addDays(5)->toDateString() }}', color: '#ef4444' },
+        { title: 'JavaScript To-Do Due', start: '{{ now()->addDays(3)->toDateString() }}', color: '#ef4444' },
+        { title: 'Midterm Assessment', start: '{{ now()->addDays(12)->toDateString() }}', color: '#7c3aed' }
       ]
     });
     calendar.render();
