@@ -60,15 +60,23 @@
     <!-- Charts -->
     <div class="row">
       <div class="col-md-8 mb-4">
-        <div class="card">
+        <div class="card h-100">
           <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-line mr-1 text-cx-primary"></i> Monthly Student Enrollment</h3></div>
-          <div class="card-body"><canvas id="chart-enrollment" style="height:300px; width:100%"></canvas></div>
+          <div class="card-body">
+            <div class="chart" style="position: relative; height: 300px; width: 100%;">
+              <canvas id="chart-enrollment"></canvas>
+            </div>
+          </div>
         </div>
       </div>
       <div class="col-md-4 mb-4">
-        <div class="card">
+        <div class="card h-100">
           <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie mr-1 text-cx-primary"></i> Category Spread</h3></div>
-          <div class="card-body"><canvas id="chart-categories" style="height:300px; width:100%"></canvas></div>
+          <div class="card-body">
+            <div class="chart" style="position: relative; height: 300px; width: 100%;">
+              <canvas id="chart-categories"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -132,36 +140,55 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('plugins/chart.js/Chart.min.js') }}"></script>
+<script src="{{ asset('plugins/chart.js/Chart.bundle.min.js') }}"></script>
 <script>
   $(document).ready(function() {
-    new Chart(document.getElementById('chart-enrollment').getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: {!! json_encode(array_keys($monthlyData)) !!},
-        datasets: [{
-          label: 'Students Enrolled',
-          data: {!! json_encode(array_values($monthlyData)) !!},
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37,99,235,0.06)',
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+    var ctxEnrollment = document.getElementById('chart-enrollment');
+    if (ctxEnrollment) {
+      new Chart(ctxEnrollment.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: {!! json_encode(array_keys($monthlyData)) !!},
+          datasets: [{
+            label: 'Students Enrolled',
+            data: {!! json_encode(array_values($monthlyData)) !!},
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37,99,235,0.08)',
+            pointRadius: 4,
+            pointBackgroundColor: '#2563eb',
+            lineTension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: { display: true, position: 'top' },
+          scales: {
+            yAxes: [{ ticks: { beginAtZero: true } }]
+          }
+        }
+      });
+    }
 
-    new Chart(document.getElementById('chart-categories').getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: {!! json_encode(array_keys($categoryData)) !!},
-        datasets: [{
-          data: {!! json_encode(array_values($categoryData)) !!},
-          backgroundColor: ['#2563eb', '#06b6d4', '#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#6366f1']
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+    var ctxCategories = document.getElementById('chart-categories');
+    if (ctxCategories) {
+      new Chart(ctxCategories.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: {!! json_encode(array_keys($categoryData)) !!},
+          datasets: [{
+            data: {!! json_encode(array_values($categoryData)) !!},
+            backgroundColor: ['#2563eb', '#06b6d4', '#7c3aed', '#10b981', '#f59e0b', '#ec4899', '#6366f1']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: { position: 'bottom' }
+        }
+      });
+    }
   });
 </script>
 @endsection

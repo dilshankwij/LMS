@@ -14,15 +14,23 @@
     </div>
     <div class="row">
       <div class="col-md-6 mb-4">
-        <div class="card">
+        <div class="card h-100">
           <div class="card-header"><h3 class="card-title">Enrollments Level Breakdown</h3></div>
-          <div class="card-body" style="height:250px"><canvas id="chart-levels" style="height:100%"></canvas></div>
+          <div class="card-body">
+            <div class="chart" style="position: relative; height: 250px; width: 100%;">
+              <canvas id="chart-levels"></canvas>
+            </div>
+          </div>
         </div>
       </div>
       <div class="col-md-6 mb-4">
-        <div class="card">
+        <div class="card h-100">
           <div class="card-header"><h3 class="card-title">GPA Distribution</h3></div>
-          <div class="card-body" style="height:250px"><canvas id="chart-gpa" style="height:100%"></canvas></div>
+          <div class="card-body">
+            <div class="chart" style="position: relative; height: 250px; width: 100%;">
+              <canvas id="chart-gpa"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -30,33 +38,47 @@
 </section>
 @endsection
 @section('scripts')
-<script src="{{ asset('plugins/chart.js/Chart.min.js') }}"></script>
+<script src="{{ asset('plugins/chart.js/Chart.bundle.min.js') }}"></script>
 <script>
   $(document).ready(function() {
-    new Chart(document.getElementById('chart-levels').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: {!! json_encode(array_keys($levelData)) !!},
-        datasets: [{
-          label: 'Students Enrolled',
-          data: {!! json_encode(array_values($levelData)) !!},
-          backgroundColor: '#06b6d4'
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+    var ctxLevels = document.getElementById('chart-levels');
+    if (ctxLevels) {
+      new Chart(ctxLevels.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: {!! json_encode(array_keys($levelData)) !!},
+          datasets: [{
+            label: 'Students Enrolled',
+            data: {!! json_encode(array_values($levelData)) !!},
+            backgroundColor: '#06b6d4'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
+        }
+      });
+    }
 
-    new Chart(document.getElementById('chart-gpa').getContext('2d'), {
-      type: 'pie',
-      data: {
-        labels: {!! json_encode(array_keys($gpaData)) !!},
-        datasets: [{
-          data: {!! json_encode(array_values($gpaData)) !!},
-          backgroundColor: ['#10b981', '#2563eb', '#f59e0b', '#f97316', '#ef4444']
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+    var ctxGpa = document.getElementById('chart-gpa');
+    if (ctxGpa) {
+      new Chart(ctxGpa.getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: {!! json_encode(array_keys($gpaData)) !!},
+          datasets: [{
+            data: {!! json_encode(array_values($gpaData)) !!},
+            backgroundColor: ['#10b981', '#2563eb', '#f59e0b', '#f97316', '#ef4444']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: { position: 'bottom' }
+        }
+      });
+    }
   });
 </script>
 @endsection
