@@ -53,53 +53,6 @@
                 </button>
               </td>
             </tr>
-
-            {{-- Student Detail Modal --}}
-            <div class="modal fade" id="studentModal{{ $s->id }}" tabindex="-1">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title">
-                      <i class="fas fa-user-graduate mr-2"></i>{{ $s->name }}
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="d-flex align-items-center mb-4">
-                      <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;flex-shrink:0;margin-right:16px;">
-                        {{ strtoupper(substr($s->name, 0, 2)) }}
-                      </div>
-                      <div>
-                        <div class="font-weight-bold" style="font-size:1.1rem;">{{ $s->name }}</div>
-                        <div class="text-muted">{{ $s->email }}</div>
-                        <div class="text-muted">{{ $s->batch ?: 'No batch assigned' }}</div>
-                      </div>
-                    </div>
-
-                    <h6 class="font-weight-bold mb-2">Enrolled Courses</h6>
-                    @if($s->enrollments->isEmpty())
-                    <p class="text-muted">Not enrolled in any of your courses.</p>
-                    @else
-                    <table class="table table-sm table-bordered">
-                      <thead><tr><th>Course</th><th>Status</th></tr></thead>
-                      <tbody>
-                        @foreach($s->enrollments as $en)
-                        <tr>
-                          <td>{{ $en->course->title ?? '—' }}</td>
-                          <td><span class="cx-badge cx-badge-success">{{ ucfirst($en->status) }}</span></td>
-                        </tr>
-                        @endforeach
-                      </tbody>
-                    </table>
-                    @endif
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <a href="{{ route('teacher.gradebook') }}" class="btn btn-cx-primary">View Grades</a>
-                  </div>
-                </div>
-              </div>
-            </div>
             @empty
             <tr>
               <td colspan="5" class="text-center text-muted py-5">
@@ -114,6 +67,62 @@
     </div>
   </div>
 </section>
+
+{{-- Modals OUTSIDE the table --}}
+@foreach($students as $s)
+<div class="modal fade" id="studentModal{{ $s->id }}" tabindex="-1" role="dialog" aria-labelledby="studentModalLabel{{ $s->id }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;">
+        <h5 class="modal-title" id="studentModalLabel{{ $s->id }}">
+          <i class="fas fa-user-graduate mr-2"></i>{{ $s->name }}
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" style="color:#fff;opacity:1;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex align-items-center mb-4">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;flex-shrink:0;margin-right:16px;">
+            {{ strtoupper(substr($s->name, 0, 2)) }}
+          </div>
+          <div>
+            <div class="font-weight-bold" style="font-size:1.05rem;">{{ $s->name }}</div>
+            <div class="text-muted small">{{ $s->email }}</div>
+            <div class="text-muted small"><i class="fas fa-layer-group mr-1"></i>{{ $s->batch ?: 'No batch assigned' }}</div>
+          </div>
+        </div>
+
+        <h6 class="font-weight-bold mb-2"><i class="fas fa-book mr-1 text-cx-primary"></i> Enrolled Courses</h6>
+        @if($s->enrollments->isEmpty())
+        <p class="text-muted">Not enrolled in any of your courses.</p>
+        @else
+        <table class="table table-sm table-bordered">
+          <thead class="thead-light">
+            <tr><th>Course</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            @foreach($s->enrollments as $en)
+            <tr>
+              <td>{{ $en->course->title ?? '—' }}</td>
+              <td><span class="cx-badge cx-badge-success">{{ ucfirst($en->status) }}</span></td>
+            </tr>
+            @endforeach
+          </tbody>
+        </table>
+        @endif
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <a href="{{ route('teacher.gradebook') }}" class="btn btn-cx-primary">
+          <i class="fas fa-clipboard-list mr-1"></i>View Grades
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+@endforeach
+
 @endsection
 
 @section('scripts')
